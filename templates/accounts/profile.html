@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <!-- Profile Overview -->
+        <div class="md:col-span-1">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Profile Information</h3>
+                        <a href="{% url 'accounts:profile_edit' %}" 
+                           class="text-sm font-medium text-blue-600 hover:text-blue-500">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </div>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="text-center mb-6">
+                            {% if profile.profile_image %}
+                            <img src="{{ profile.profile_image.url }}" 
+                                 alt="{{ user.get_full_name }}"
+                                 class="h-32 w-32 rounded-full mx-auto object-cover">
+                            {% else %}
+                            <div class="h-32 w-32 rounded-full bg-gray-200 mx-auto flex items-center justify-center">
+                                <i class="fas fa-user text-gray-400 text-5xl"></i>
+                            </div>
+                            {% endif %}
+                            <h2 class="mt-4 text-xl font-semibold text-gray-900">{{ user.get_full_name }}</h2>
+                            <p class="text-sm text-gray-500">{{ user.email }}</p>
+                        </div>
+
+                        <dl class="grid grid-cols-1 gap-4">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">User Type</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ profile.get_user_type_display }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ profile.phone|default:"-" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Mobile</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ profile.mobile|default:"-" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Address</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ profile.address|default:"-" }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Member Since</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ profile.created_at|date:"F j, Y" }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Settings -->
+        <div class="mt-5 md:mt-0 md:col-span-2">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Account Settings</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div class="px-4 py-5 sm:p-6 space-y-6">
+                        <!-- Security Settings -->
+                        <div>
+                            <h4 class="text-base font-medium text-gray-900">Security</h4>
+                            <div class="mt-4 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Password</p>
+                                        <p class="text-sm text-gray-500">Change your password regularly to keep your account secure.</p>
+                                    </div>
+                                    <a href="{% url 'accounts:change_password' %}" 
+                                       class="text-sm font-medium text-blue-600 hover:text-blue-500">
+                                        Change Password
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notification Settings -->
+                        <div>
+                            <h4 class="text-base font-medium text-gray-900">Notifications</h4>
+                            <div class="mt-4 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Email Preferences</p>
+                                        <p class="text-sm text-gray-500">Manage your notification preferences.</p>
+                                    </div>
+                                    <a href="{% url 'accounts:notification_preferences' %}" 
+                                       class="text-sm font-medium text-blue-600 hover:text-blue-500">
+                                        Manage Preferences
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if profile.user_type == 'assembler' %}
+            <!-- Assembler Status -->
+            <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Assembler Status</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Availability Status</p>
+                                <p class="text-sm text-gray-500">
+                                    {% if profile.is_available %}
+                                    You are currently marked as available for new tasks
+                                    {% else %}
+                                    You are currently marked as unavailable for new tasks
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                       {% if profile.is_available %}bg-green-100 text-green-800
+                                       {% else %}bg-red-100 text-red-800{% endif %}">
+                                {% if profile.is_available %}Available{% else %}Unavailable{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

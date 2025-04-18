@@ -1,15 +1,14 @@
-from pathlib import Path
-import os
-from dotenv import load_dotenv
+"""
+Django settings for microassembler project.
+"""
 
-# Load environment variables
-load_dotenv()
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-this')
+SECRET_KEY = 'django-insecure-your-secret-key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,8 +30,8 @@ INSTALLED_APPS = [
     # Local apps
     'accounts',
     'customers',
-    'supervisor',
     'assembler',
+    'supervisor',
     'core',
 ]
 
@@ -99,12 +98,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Media files
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -113,14 +110,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 # Authentication
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'core:home'
+LOGOUT_REDIRECT_URL = 'core:home'
 
 # Email settings (configure these in production)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Notifications
-DJANGO_NOTIFICATIONS_CONFIG = {
-    'USE_JSONFIELD': True,
-}

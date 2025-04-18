@@ -1,0 +1,37 @@
+{% if form_show_errors %}
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="rounded-md bg-red-50 p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-red-800">{{ error }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endif %}
+
+{% if form_method|lower == 'get' %}
+    <form method="{{ form_method|lower }}" action="{{ form_action|default:'' }}" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+{% else %}
+    <form method="{{ form_method|lower }}" action="{{ form_action|default:'' }}" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+    {% csrf_token %}
+{% endif %}
+
+{% for field in form %}
+    {% include 'crispy_forms/tailwind/field.html' %}
+{% endfor %}
+
+{% if inputs %}
+    <div class="mt-6">
+        {% for input in inputs %}
+            {% include "crispy_forms/tailwind/submit_button.html" with field=input %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+</form>

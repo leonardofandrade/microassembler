@@ -1,7 +1,24 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from .models import UserProfile, RegistrationRequest
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+        'placeholder': 'Enter your username',
+        'autocomplete': 'username'
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+        'placeholder': 'Enter your password',
+        'autocomplete': 'current-password'
+    }))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Username'
+        self.fields['password'].label = 'Password'
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -89,13 +106,13 @@ class NotificationPreferenceForm(forms.ModelForm):
         fields = ['email_notifications', 'browser_notifications', 'notification_frequency']
         widgets = {
             'email_notifications': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
+                'class': 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
             }),
             'browser_notifications': forms.CheckboxInput(attrs={
-                'class': 'form-check-input'
+                'class': 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
             }),
             'notification_frequency': forms.Select(attrs={
-                'class': 'form-control'
+                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
             })
         }
 

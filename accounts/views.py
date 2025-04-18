@@ -9,10 +9,12 @@ from .forms import (
     UserRegistrationForm,
     UserProfileForm,
     NotificationPreferenceForm,
+    LoginForm,
 )
 
 class LoginView(AuthLoginView):
     template_name = 'accounts/login.html'
+    form_class = LoginForm
     redirect_authenticated_user = True
 
 class LogoutView(AuthLogoutView):
