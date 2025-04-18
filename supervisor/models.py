@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from core.models import Notification
+from notifications.signals import notify
 
 class ComponentType(models.Model):
     name = models.CharField(max_length=100)
@@ -82,13 +82,11 @@ class Component(models.Model):
             # Notify supervisors about low stock
             supervisors = User.objects.filter(is_staff=True)
             for supervisor in supervisors:
-                Notification.send_notification(
+                notify.send(
+                    sender=self,
                     recipient=supervisor,
-                    title='Low Stock Alert',
-                    message=f'Low stock alert: {self.name} ({self.stock} remaining)',
-                    level='warning',
-                    related_object_type='Component',
-                    related_object_id=self.id
+                    verb='low_stock',
+                    description=f'Low stock alert: {self.name} ({self.stock} remaining)'
                 )
 
         super().save(*args, **kwargs)

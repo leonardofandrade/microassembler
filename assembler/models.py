@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from customers.models import AssemblyRequest
-from core.models import Notification
+from notifications.signals import notify
 
 class AssemblyTask(models.Model):
     STATUS_CHOICES = [
@@ -53,28 +53,24 @@ class AssemblyTask(models.Model):
                     self.actual_completion = timezone.now()
                 
                 # Notify customer about status change
-                Notification.send_notification(
+                notify.send(
+                    sender=self.assembler,
                     recipient=self.request.customer,
-                    title='Assembly Task Update',
-                    message=f'Assembly task status updated to {self.get_status_display()}',
-                    level='info',
-                    related_object_type='AssemblyTask',
-                    related_object_id=self.pk,
-                    sender=self.assembler
+                    verb='updated',
+                    action_object=self,
+                    description=f'Assembly task status updated to {self.get_status_display()}'
                 )
 
                 # Notify supervisor if issues are found
                 if self.status == 'issues':
                     supervisors = User.objects.filter(is_staff=True)
                     for supervisor in supervisors:
-                        Notification.send_notification(
+                        notify.send(
+                            sender=self.assembler,
                             recipient=supervisor,
-                            title='Assembly Issues Reported',
-                            message=f'Issues reported in assembly task #{self.pk}',
-                            level='warning',
-                            related_object_type='AssemblyTask',
-                            related_object_id=self.pk,
-                            sender=self.assembler
+                            verb='reported',
+                            action_object=self,
+                            description=f'Issues reported in assembly task #{self.pk}'
                         )
 
         super().save(*args, **kwargs)
@@ -166,14 +162,12 @@ class IssueReport(models.Model):
             # Notify supervisors
             supervisors = User.objects.filter(is_staff=True)
             for supervisor in supervisors:
-                Notification.send_notification(
+                notify.send(
+                    sender=self.reported_by,
                     recipient=supervisor,
-                    title='New Issue Reported',
-                    message=f'New {self.get_priority_display()} priority issue reported: {self.title}',
-                    level='warning',
-                    related_object_type='IssueReport',
-                    related_object_id=self.pk,
-                    sender=self.reported_by
+                    verb='reported',
+                    action_object=self,
+                    description=f'New {self.get_priority_display()} priority issue reported: {self.title}'
                 )
 
         super().save(*args, **kwargs)

@@ -21,14 +21,60 @@ class LoginForm(AuthenticationForm):
         self.fields['password'].label = 'Password'
 
 class UserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    first_name = forms.CharField(required=True)
-    last_name = forms.CharField(required=True)
-    address = forms.CharField(widget=forms.Textarea)
-    phone = forms.CharField(max_length=20)
-    mobile = forms.CharField(max_length=20)
-    user_type = forms.ChoiceField(choices=UserProfile.USER_TYPE_CHOICES)
-    profile_image = forms.ImageField(required=False)
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Enter your email'
+        })
+    )
+    first_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Enter your first name'
+        })
+    )
+    last_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Enter your last name'
+        })
+    )
+    address = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Enter your address',
+            'rows': 3
+        })
+    )
+    phone = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Enter your phone number'
+        })
+    )
+    mobile = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Enter your mobile number'
+        })
+    )
+    user_type = forms.ChoiceField(
+        choices=UserProfile.USER_TYPE_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
+        })
+    )
+    profile_image = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'
+        })
+    )
 
     class Meta:
         model = User
@@ -36,6 +82,21 @@ class UserRegistrationForm(UserCreationForm):
             'username', 'email', 'first_name', 'last_name', 'password1',
             'password2', 'address', 'phone', 'mobile', 'user_type', 'profile_image'
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Choose a username'
+        })
+        self.fields['password1'].widget.attrs.update({
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Enter your password'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+            'placeholder': 'Confirm your password'
+        })
 
     def save(self, commit=True):
         user = super().save(commit=False)

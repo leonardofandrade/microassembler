@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from supervisor.models import Component, ComponentCompatibility
-from core.models import Notification
+from notifications.signals import notify
 
 class AssemblyRequest(models.Model):
     STATUS_CHOICES = [
@@ -63,14 +63,12 @@ class AssemblyRequest(models.Model):
             # Notify supervisors about new request
             supervisors = User.objects.filter(is_staff=True)
             for supervisor in supervisors:
-                Notification.send_notification(
+                notify.send(
+                    sender=self.customer,
                     recipient=supervisor,
-                    title='New Assembly Request',
-                    message=f'New assembly request #{self.id} created by {self.customer.username}',
-                    level='info',
-                    related_object_type='AssemblyRequest',
-                    related_object_id=self.id,
-                    sender=self.customer
+                    verb='created',
+                    action_object=self,
+                    description=f'New assembly request #{self.id} created'
                 )
         else:
             # If status changed to approved/rejected, set reviewed info
@@ -81,14 +79,12 @@ class AssemblyRequest(models.Model):
             # If assigned_to changed, notify the assembler
             if self.assigned_to and self.assigned_to_id != self._state.fields_cache.get('assigned_to_id'):
                 self.assigned_at = timezone.now()
-                Notification.send_notification(
+                notify.send(
+                    sender=self.reviewed_by or self.customer,
                     recipient=self.assigned_to,
-                    title='Assembly Request Assigned',
-                    message=f'Assembly request #{self.id} has been assigned to you',
-                    level='info',
-                    related_object_type='AssemblyRequest',
-                    related_object_id=self.id,
-                    sender=self.reviewed_by or self.customer
+                    verb='assigned',
+                    action_object=self,
+                    description=f'Assembly request #{self.id} has been assigned to you'
                 )
             
             super().save(*args, **kwargs)
@@ -168,14 +164,12 @@ class AssemblyProgress(models.Model):
         if self.pk:  # If this is an update
             old_instance = AssemblyProgress.objects.get(pk=self.pk)
             if old_instance.status != self.status:
-                Notification.send_notification(
+                notify.send(
+                    sender=self.updated_by,
                     recipient=self.request.customer,
-                    title='Assembly Status Update',
-                    message=f'Assembly status updated to {self.get_status_display()}',
-                    level='info',
-                    related_object_type='AssemblyProgress',
-                    related_object_id=self.id,
-                    sender=self.updated_by
+                    verb='updated',
+                    action_object=self,
+                    description=f'Assembly status updated to {self.get_status_display()}'
                 )
 
         super().save(*args, **kwargs)

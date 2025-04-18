@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     
     # Third party apps
     'crispy_forms',
+    'crispy_tailwind',
     
     # Local apps
     'accounts',
@@ -107,7 +108,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Crispy Forms
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 # Authentication
 LOGIN_URL = 'accounts:login'
