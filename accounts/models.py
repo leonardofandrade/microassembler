@@ -87,7 +87,18 @@ class RegistrationRequest(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     """Create a UserProfile for every new User."""
     if created:
-        UserProfile.objects.create(user=instance)
+        # For superusers, create a profile with default values
+        if instance.is_superuser:
+            UserProfile.objects.create(
+                user=instance,
+                user_type='customer',  # Default type
+                address='N/A',  # Default address
+                phone='N/A',  # Default phone
+                mobile='N/A',  # Default mobile
+                is_approved=True  # Auto-approve superusers
+            )
+        else:
+            UserProfile.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):

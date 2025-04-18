@@ -80,18 +80,45 @@
                                 {% endif %}
                             </a>
                         </div>
-                        <div class="relative ml-3" x-data="{ open: false }">
-                            <button @click="open = !open" class="text-white hover:text-gray-200 flex items-center">
-                                <i class="fas fa-user mr-2"></i>
-                                <span>{{ user.username }}</span>
-                                <i class="fas fa-chevron-down ml-2"></i>
-                            </button>
-                            <div x-show="open" @click.away="open = false" 
-                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                        <div class="relative ml-3" x-data="{ open: false }" @keydown.escape.stop="open = false" @click.away="open = false">
+                            <div>
+                                <button type="button" 
+                                        class="text-white hover:text-gray-200 flex items-center" 
+                                        @click="open = !open"
+                                        id="user-menu-button" 
+                                        aria-expanded="false" 
+                                        aria-haspopup="true">
+                                    <i class="fas fa-user mr-2"></i>
+                                    <span>{{ user.username }}</span>
+                                    <i class="fas fa-chevron-down ml-2"></i>
+                                </button>
+                            </div>
+                            <div x-show="open" 
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                 role="menu" 
+                                 aria-orientation="vertical" 
+                                 aria-labelledby="user-menu-button" 
+                                 tabindex="-1"
+                                 style="display: none;">
                                 <a href="{% url 'accounts:profile' %}" 
-                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-                                <a href="{% url 'accounts:logout' %}" 
-                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                   role="menuitem" 
+                                   tabindex="-1">Profile</a>
+                                <form method="post" action="{% url 'accounts:logout' %}" class="block">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            role="menuitem" 
+                                            tabindex="-1">
+                                        Logout
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     {% else %}
@@ -134,7 +161,7 @@
     </footer>
 
     <!-- Alpine.js for dropdowns -->
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

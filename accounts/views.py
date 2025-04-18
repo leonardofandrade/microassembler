@@ -17,6 +17,16 @@ class LoginView(AuthLoginView):
     form_class = LoginForm
     redirect_authenticated_user = True
 
+    def get_success_url(self):
+        if self.request.user.is_staff:
+            return reverse_lazy('supervisor:dashboard')
+        elif hasattr(self.request.user, 'profile'):
+            if self.request.user.profile.is_assembler:
+                return reverse_lazy('assembler:dashboard')
+            else:
+                return reverse_lazy('customer:dashboard')
+        return reverse_lazy('core:home')
+
 class LogoutView(AuthLogoutView):
     next_page = 'core:home'
 

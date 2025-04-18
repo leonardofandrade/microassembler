@@ -98,21 +98,29 @@ class AnnouncementForm(forms.ModelForm):
         model = SystemAnnouncement
         fields = ['title', 'message', 'priority', 'start_date', 'end_date', 'active']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'message': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4
+            'title': forms.TextInput(attrs={
+                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm',
+                'placeholder': 'Enter announcement title'
             }),
-            'priority': forms.Select(attrs={'class': 'form-control'}),
+            'message': forms.Textarea(attrs={
+                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm',
+                'rows': 4,
+                'placeholder': 'Enter announcement message'
+            }),
+            'priority': forms.Select(attrs={
+                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
+            }),
             'start_date': forms.DateTimeInput(attrs={
-                'class': 'form-control',
+                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm',
                 'type': 'datetime-local'
             }),
             'end_date': forms.DateTimeInput(attrs={
-                'class': 'form-control',
+                'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm',
                 'type': 'datetime-local'
             }),
-            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'})
+            'active': forms.CheckboxInput(attrs={
+                'class': 'h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+            })
         }
 
     def clean(self):
