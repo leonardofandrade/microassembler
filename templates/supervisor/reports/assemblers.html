@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Assembler Report{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Assembler Report</h1>
+
+    <!-- Statistics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Assemblers -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Assemblers</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ total_assemblers }}</p>
+                    </div>
+                    <div class="bg-blue-100 rounded-full p-3">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Assemblers -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Assemblers</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ active_assemblers }}</p>
+                    </div>
+                    <div class="bg-green-100 rounded-full p-3">
+                        <i class="fas fa-user-check text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Assemblers -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Currently Available</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ available_assemblers }}</p>
+                    </div>
+                    <div class="bg-purple-100 rounded-full p-3">
+                        <i class="fas fa-clock text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Statistics -->
+    <div class="bg-white shadow rounded-lg overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Assembler Performance</h2>
+        </div>
+        <div class="p-6">
+            {% if performance_stats %}
+            <div class="grid grid-cols-1 gap-6">
+                {% for stat in performance_stats %}
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            {% if stat.assembler.profile_image %}
+                            <img src="{{ stat.assembler.profile_image.url }}" 
+                                 alt="{{ stat.assembler.user.get_full_name }}"
+                                 class="h-10 w-10 rounded-full object-cover">
+                            {% else %}
+                            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            {% endif %}
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-gray-900">
+                                    {{ stat.assembler.user.get_full_name }}
+                                </h3>
+                                <p class="text-sm text-gray-500">
+                                    {{ stat.completed_tasks }} tasks completed
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                       {% if stat.on_time_percentage >= 90 %}bg-green-100 text-green-800
+                                       {% elif stat.on_time_percentage >= 70 %}bg-yellow-100 text-yellow-800
+                                       {% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ stat.on_time_percentage|floatformat:1 }}% On Time
+                            </span>
+                        </div>
+                    </div>
+                    <div class="relative pt-1">
+                        <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                            <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center 
+                                      {% if stat.on_time_percentage >= 90 %}bg-green-500
+                                      {% elif stat.on_time_percentage >= 70 %}bg-yellow-500
+                                      {% else %}bg-red-500{% endif %}"
+                                 style="width: {{ stat.on_time_percentage }}%">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-6">
+                <i class="fas fa-chart-bar text-gray-400 text-3xl mb-3"></i>
+                <p class="text-gray-500">No performance data available yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Quick Actions</h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{% url 'supervisor:assembler_list' %}" 
+               class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-list mr-2"></i>
+                View All Assemblers
+            </a>
+            <a href="{% url 'supervisor:assembler_list' %}?status=pending" 
+               class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                <i class="fas fa-user-clock mr-2"></i>
+                Pending Approvals
+            </a>
+            <a href="{% url 'supervisor:request_list' %}" 
+               class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <i class="fas fa-tasks mr-2"></i>
+                Manage Tasks
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

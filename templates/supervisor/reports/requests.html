@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Report{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Assembly Request Report</h1>
+
+    <!-- Monthly Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Requests This Month -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Monthly Requests</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ monthly_stats.total }}</p>
+                    </div>
+                    <div class="bg-blue-100 rounded-full p-3">
+                        <i class="fas fa-calendar-alt text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed This Month -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Monthly Completed</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ monthly_stats.completed }}</p>
+                    </div>
+                    <div class="bg-green-100 rounded-full p-3">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending This Month -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Monthly Pending</p>
+                        <p class="text-3xl font-semibold text-gray-900">{{ monthly_stats.pending }}</p>
+                    </div>
+                    <div class="bg-yellow-100 rounded-full p-3">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requests by Status -->
+    <div class="bg-white shadow rounded-lg overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Requests by Status</h2>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for status in requests_by_status %}
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-900">
+                            {{ status.status|title }}
+                        </h3>
+                        <span class="text-2xl font-semibold text-gray-900">{{ status.count }}</span>
+                    </div>
+                    <div class="relative pt-1">
+                        <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+                            <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center 
+                                      {% if status.status == 'completed' %}bg-green-500
+                                      {% elif status.status == 'pending' %}bg-yellow-500
+                                      {% elif status.status == 'in_progress' %}bg-blue-500
+                                      {% else %}bg-gray-500{% endif %}"
+                                 style="width: {% widthratio status.count total_requests 100 %}%">
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500">
+                        {% widthratio status.count total_requests 100 %}% of total requests
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Quick Actions</h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="{% url 'supervisor:request_list' %}" 
+               class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-list mr-2"></i>
+                View All Requests
+            </a>
+            <a href="{% url 'supervisor:request_list' %}?status=pending" 
+               class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                <i class="fas fa-clock mr-2"></i>
+                View Pending
+            </a>
+            <a href="{% url 'supervisor:assembler_list' %}" 
+               class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <i class="fas fa-users mr-2"></i>
+                Manage Assemblers
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

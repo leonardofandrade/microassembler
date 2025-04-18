@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Reject Assembler{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="bg-red-600 px-6 py-4">
+                <h4 class="text-xl font-semibold text-white">Reject Assembler</h4>
+            </div>
+            <div class="p-6">
+                <!-- Assembler Details -->
+                <div class="mb-6">
+                    <h5 class="text-lg font-medium text-gray-900 mb-4">Assembler Details</h5>
+                    <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+                        <div class="flex items-center">
+                            {% if object.profile_image %}
+                            <img src="{{ object.profile_image.url }}" 
+                                 alt="{{ object.user.get_full_name }}"
+                                 class="h-12 w-12 rounded-full object-cover">
+                            {% else %}
+                            <div class="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                            {% endif %}
+                            <div class="ml-4">
+                                <h6 class="text-sm font-medium text-gray-900">{{ object.user.get_full_name }}</h6>
+                                <p class="text-sm text-gray-500">{{ object.user.email }}</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Phone</p>
+                                <p class="text-sm text-gray-900">{{ object.phone }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Mobile</p>
+                                <p class="text-sm text-gray-900">{{ object.mobile }}</p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-sm font-medium text-gray-500">Address</p>
+                                <p class="text-sm text-gray-900">{{ object.address }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Alert -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-yellow-800">
+                                Rejecting this assembler will:
+                            </h3>
+                            <div class="mt-2 text-sm text-yellow-700">
+                                <ul class="list-disc list-inside">
+                                    <li>Prevent them from accessing the assembler dashboard</li>
+                                    <li>Remove them from any assigned tasks</li>
+                                    <li>Send them a notification with the rejection reason</li>
+                                    <li>Keep their profile in the system for record-keeping</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rejection Form -->
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" 
+                               class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ field.label }}
+                        </label>
+                        {{ field|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" }}
+                        {% if field.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ field.errors }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="mt-6 flex justify-between items-center">
+                        <a href="{% url 'supervisor:assembler_list' %}" 
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back
+                        </a>
+                        <button type="submit" 
+                                class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <i class="fas fa-times mr-2"></i>
+                            Reject Assembler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

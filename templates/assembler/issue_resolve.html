@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Resolve Issue{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="bg-blue-600 px-6 py-4">
+                <h4 class="text-xl font-semibold text-white">Resolve Issue</h4>
+            </div>
+            <div class="p-6">
+                <!-- Issue Details -->
+                <div class="mb-6">
+                    <h5 class="text-lg font-medium text-gray-900 mb-4">Issue Details</h5>
+                    <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Title</p>
+                            <p class="text-sm text-gray-900">{{ object.title }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Priority</p>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                       {% if object.priority == 'critical' %}bg-red-100 text-red-800
+                                       {% elif object.priority == 'high' %}bg-yellow-100 text-yellow-800
+                                       {% elif object.priority == 'medium' %}bg-blue-100 text-blue-800
+                                       {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ object.get_priority_display }}
+                            </span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Task</p>
+                            <p class="text-sm text-gray-900">{{ object.task }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Description</p>
+                            <p class="text-sm text-gray-900">{{ object.description }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resolution Form -->
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" 
+                               class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ field.label }}
+                        </label>
+                        {{ field|add_class:"mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" }}
+                        {% if field.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ field.errors }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <!-- Information Alert -->
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800">
+                                    Resolving this issue will:
+                                </h3>
+                                <div class="mt-2 text-sm text-blue-700">
+                                    <ul class="list-disc list-inside">
+                                        <li>Mark the issue as resolved</li>
+                                        <li>Record your resolution notes</li>
+                                        <li>Update the task status if this is the last unresolved issue</li>
+                                        <li>Notify relevant team members</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <a href="{% url 'assembler:issue_list' %}" 
+                           class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back
+                        </a>
+                        <button type="submit" 
+                                class="inline-flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class="fas fa-check mr-2"></i>
+                            Resolve Issue
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Related Issues -->
+        <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h5 class="text-lg font-medium text-gray-900">Related Issues</h5>
+            </div>
+            <div class="divide-y divide-gray-200">
+                {% with related_issues=object.task.issues.exclude.filter.count %}
+                {% if related_issues %}
+                    {% for issue in object.task.issues.exclude.all|slice:":5" %}
+                    <div class="p-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h6 class="text-sm font-medium text-gray-900">{{ issue.title }}</h6>
+                                <p class="text-xs text-gray-500">
+                                    {{ issue.get_priority_display }} Priority
+                                    • Reported {{ issue.created_at|timesince }} ago
+                                </p>
+                            </div>
+                            {% if issue.resolved %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Resolved
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Pending
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="p-6 text-center">
+                        <p class="text-sm text-gray-500">No other issues found for this task.</p>
+                    </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

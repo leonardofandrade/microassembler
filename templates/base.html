@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PC Assembly Management{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <a href="{% url 'core:home' %}" class="flex items-center text-white font-semibold text-lg">
+                        PC Assembly
+                    </a>
+                    {% if user.is_authenticated %}
+                        <div class="hidden sm:ml-6 sm:flex sm:space-x-4">
+                            {% if user.is_staff %}
+                                <a href="{% url 'supervisor:dashboard' %}" 
+                                   class="text-white hover:bg-blue-500 px-3 py-2 rounded-md">Dashboard</a>
+                            {% elif user.profile.is_assembler %}
+                                <a href="{% url 'assembler:dashboard' %}" 
+                                   class="text-white hover:bg-blue-500 px-3 py-2 rounded-md">Dashboard</a>
+                            {% else %}
+                                <a href="{% url 'customer:dashboard' %}" 
+                                   class="text-white hover:bg-blue-500 px-3 py-2 rounded-md">Dashboard</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="flex items-center">
+                    {% if user.is_authenticated %}
+                        <div class="relative mr-4">
+                            <a href="{% url 'core:notifications' %}" class="text-white hover:text-gray-200">
+                                <i class="fas fa-bell"></i>
+                                {% if unread_notifications_count %}
+                                    <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {{ unread_notifications_count }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="relative ml-3" x-data="{ open: false }">
+                            <button @click="open = !open" class="text-white hover:text-gray-200 flex items-center">
+                                <i class="fas fa-user mr-2"></i>
+                                <span>{{ user.username }}</span>
+                                <i class="fas fa-chevron-down ml-2"></i>
+                            </button>
+                            <div x-show="open" @click.away="open = false" 
+                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                                <a href="{% url 'accounts:profile' %}" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                <a href="{% url 'accounts:logout' %}" 
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" 
+                           class="text-white hover:bg-blue-500 px-3 py-2 rounded-md">Login</a>
+                        <a href="{% url 'accounts:register' %}" 
+                           class="text-white hover:bg-blue-500 px-3 py-2 rounded-md">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+                <div class="rounded-md p-4 mb-4 {% if message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200
+                                                 {% elif message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+                                                 {% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-700 border border-yellow-200
+                                                 {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500">
+                &copy; {% now "Y" %} PC Assembly Management. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Alpine.js for dropdowns -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

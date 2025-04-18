@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ assembler.user.get_full_name }} - Assembler Details{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Profile Card -->
+        <div class="lg:col-span-1">
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="p-6 text-center">
+                    {% if assembler.profile_image %}
+                    <img src="{{ assembler.profile_image.url }}" 
+                         alt="{{ assembler.user.get_full_name }}"
+                         class="h-32 w-32 rounded-full mx-auto object-cover">
+                    {% else %}
+                    <div class="h-32 w-32 rounded-full bg-gray-200 mx-auto flex items-center justify-center">
+                        <i class="fas fa-user text-gray-400 text-5xl"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <h2 class="mt-4 text-xl font-semibold text-gray-900">
+                        {{ assembler.user.get_full_name }}
+                    </h2>
+                    <p class="text-gray-500">{{ assembler.user.email }}</p>
+                    
+                    <div class="mt-4 space-y-2">
+                        {% if assembler.is_approved %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-check-circle mr-2"></i>Approved
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-clock mr-2"></i>Pending
+                        </span>
+                        {% endif %}
+
+                        {% if assembler.is_available %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-check mr-2"></i>Available
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                            <i class="fas fa-times mr-2"></i>Unavailable
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-6 border-t border-gray-200 pt-4">
+                        <div class="space-y-3 text-left">
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-phone w-5 text-gray-400"></i>
+                                <span class="ml-2">{{ assembler.phone }}</span>
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-mobile-alt w-5 text-gray-400"></i>
+                                <span class="ml-2">{{ assembler.mobile }}</span>
+                            </div>
+                            <div class="flex items-start text-gray-700">
+                                <i class="fas fa-map-marker-alt w-5 mt-1 text-gray-400"></i>
+                                <span class="ml-2">{{ assembler.address }}</span>
+                            </div>
+                            <div class="flex items-center text-gray-700">
+                                <i class="fas fa-calendar w-5 text-gray-400"></i>
+                                <span class="ml-2">Joined {{ assembler.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if not assembler.is_approved %}
+                    <div class="mt-6 space-y-3">
+                        <a href="{% url 'supervisor:assembler_approve' assembler.pk %}" 
+                           class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class="fas fa-check mr-2"></i>
+                            Approve Assembler
+                        </a>
+                        <a href="{% url 'supervisor:assembler_reject' assembler.pk %}" 
+                           class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <i class="fas fa-times mr-2"></i>
+                            Reject Assembler
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Performance Metrics</h3>
+                </div>
+                <div class="p-6">
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">On-Time Completion Rate</span>
+                            <span class="text-sm font-medium text-gray-900">{{ on_time_percentage|floatformat:1 }}%</span>
+                        </div>
+                        <div class="overflow-hidden h-2 rounded bg-gray-200">
+                            <div class="h-2 rounded bg-green-500" 
+                                 style="width: {{ on_time_percentage }}%"></div>
+                        </div>
+                        <p class="mt-2 text-xs text-gray-500">
+                            {{ on_time_completion }} out of {{ total_completed }} tasks completed on time
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-2xl font-semibold text-gray-900">{{ completed_tasks }}</div>
+                            <div class="text-sm text-gray-500">Completed Tasks</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="text-2xl font-semibold text-gray-900">{{ in_progress_tasks }}</div>
+                            <div class="text-sm text-gray-500">In Progress</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Tasks and Details -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Recent Tasks -->
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Recent Tasks</h3>
+                </div>
+                <div class="divide-y divide-gray-200">
+                    {% if recent_tasks %}
+                        {% for task in recent_tasks %}
+                        <div class="p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-900">Assembly Task #{{ task.pk }}</h4>
+                                    <p class="text-sm text-gray-500">{{ task.request.title }}</p>
+                                </div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                           {% if task.status == 'completed' %}bg-green-100 text-green-800
+                                           {% elif task.status == 'issues' %}bg-red-100 text-red-800
+                                           {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                    {{ task.get_status_display }}
+                                </span>
+                            </div>
+                            <div class="mt-2 grid grid-cols-2 gap-4 text-sm text-gray-500">
+                                <div>
+                                    <span class="font-medium">Started:</span>
+                                    {% if task.start_date %}
+                                        {{ task.start_date|date:"M d, Y" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <span class="font-medium">Completed:</span>
+                                    {% if task.actual_completion %}
+                                        {{ task.actual_completion|date:"M d, Y" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-6 text-center">
+                            <i class="fas fa-tasks text-gray-400 text-3xl mb-3"></i>
+                            <p class="text-gray-500">No tasks found for this assembler.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if assembler.rejection_reason %}
+            <!-- Rejection Details -->
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 bg-red-50">
+                    <h3 class="text-lg font-medium text-red-900">Rejection Details</h3>
+                </div>
+                <div class="p-6">
+                    <dl class="grid grid-cols-1 gap-4">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Rejected By</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ assembler.rejected_by.get_full_name }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Rejected At</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ assembler.rejected_at|date:"M d, Y H:i" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Reason</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ assembler.rejection_reason }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
